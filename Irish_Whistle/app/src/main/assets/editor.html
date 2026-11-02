@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor preview</title>
+    <style>
+        body { margin: 0; padding: 4px; background: #fff; }
+        #warnings { color: #b00020; font: 12px sans-serif; }
+    </style>
+</head>
+<body>
+<div id="paper" style="width:100%"></div>
+<div id="warnings"></div>
+<script type="text/javascript" src="abcjs_basic_5.11.0-min.js"></script>
+<script type="text/javascript">
+    function render(abc) {
+        var tunes = ABCJS.renderAbc("paper", abc, {responsive: "resize"});
+        var w = (tunes && tunes[0] && tunes[0].warnings) ? tunes[0].warnings : [];
+        document.getElementById("warnings").innerHTML = w.join("<br>");
+    }
+</script>
+</body>
+</html>

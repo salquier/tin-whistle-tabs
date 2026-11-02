@@ -84,9 +84,12 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
         tab = findViewById(R.id.TabActivity_tab);
         countdownOverlay = findViewById(R.id.TabActivity_countdown);
         try {
-            notes = MusicDB.open(this, sheet.getFile());
+            notes = MusicDB.open(this, sheet);
         } catch (Exception e) {
+            Toast.makeText(this, getString(R.string.error_tune_generation, e.getMessage()),
+                    Toast.LENGTH_LONG).show();
             finish();
+            return;
         }
         scrollView = findViewById(R.id.TabActivity_tabScrollPane);
         tab.setText(MusicSheet.notesToTabs(notes), TextView.BufferType.SPANNABLE);

@@ -54,4 +54,27 @@
     <!-- Error messages -->
     <string name="error_contact">Could not send mail: %1$s</string>
     <string name="error_tune_generation">Media playback disabled: %1$s</string>
+
+    <!-- Editor -->
+    <string name="menu_add_tune">Add a tune</string>
+    <string name="editor_title_new">New tune</string>
+    <string name="editor_title_edit">Edit tune</string>
+    <string name="editor_title_hint">Title</string>
+    <string name="editor_abc_hint">Type the tune in ABC notation…</string>
+    <string name="editor_play">Try the tabs</string>
+    <string name="editor_save">Save</string>
+    <string name="editor_delete">Delete</string>
+    <string name="editor_discard">Discard</string>
+    <string name="editor_discard_confirm">Discard your changes?</string>
+    <string name="editor_delete_confirm">Delete \"%1$s\"?</string>
+    <string name="editor_saved">\"%1$s\" saved</string>
+    <string name="editor_status_ok">Whistle: %1$s · %2$d notes</string>
+    <string name="editor_error_no_title">Please give the tune a title.</string>
+    <string name="editor_error_invalid">Cannot use this tune: %1$s</string>
+    <string name="editor_error_save">Could not save: %1$s</string>
+    <string name="editor_help_title">ABC notation help</string>
+    <string name="editor_help">Header lines (before the music):\nM:6/8 meter · L:1/8 default note length · Q:1/4=100 tempo · K:D key (G, Ador, Em, Amix…)\n\nNotes: C D E F G A B (low octave), c d e f g a b (high octave), c\' one octave higher, C, one octave lower. z is a rest.\n\nLengths: A2 double, A3 dotted, A/2 or A/ half. A&gt;B dotted rhythm, (3ABc triplet, A-A tie.\n\nAccidentals: ^F sharp, _B flat, =F natural.\n\nBars and repeats: | bar, |: … :| repeat, [1 … :|[2 … alternate endings, |] end.\n\nThe whistle key is chosen automatically. You can paste any tune in ABC format (from thesession.org for example).</string>
+    <string name="main_longpress_edit">Edit</string>
+    <string name="main_longpress_delete">Delete</string>
+    <string name="main_longpress_copy">Copy into the editor</string>
 </resources>
