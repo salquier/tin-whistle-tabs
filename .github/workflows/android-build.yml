@@ -73,6 +73,10 @@ jobs:
           SDKMANAGER="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
           "$SDKMANAGER" "platforms;android-33" "build-tools;30.0.3"
 
+      - name: Run unit tests
+        working-directory: Irish_Whistle
+        run: bash gradlew testDebugUnitTest --no-daemon
+
       - name: Build debug APK
         working-directory: Irish_Whistle
         run: bash gradlew assembleDebug --no-daemon
