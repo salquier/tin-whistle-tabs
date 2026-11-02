@@ -252,7 +252,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private void tryTabs() {
         try {
-            final MusicSheet sheet = buildSheet(MusicSheet.USER_TUNE_PREFIX + "preview");
+            final MusicSheet sheet = buildSheet(MusicSheet.PREVIEW_FILE);
             final Intent intent = new Intent(getApplicationContext(), TabActivity.class);
             intent.putExtra(MainActivity.EXTRA_SHEET, sheet);
             startActivity(intent);

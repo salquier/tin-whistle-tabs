@@ -9,6 +9,8 @@ import java.util.List;
 public class MusicSheet implements Serializable {
     /** File prefix of tunes created by the user in the editor (no pre-generated note file). */
     public static final String USER_TUNE_PREFIX = "u_";
+    /** File id of the unsaved tune opened from the editor with "Try the tabs". */
+    public static final String PREVIEW_FILE = USER_TUNE_PREFIX + "preview";
 
     // Constants
     /* final static public int DIFFICULTY_EASY = 0,

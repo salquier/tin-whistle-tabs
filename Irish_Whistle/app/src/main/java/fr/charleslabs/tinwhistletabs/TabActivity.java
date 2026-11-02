@@ -138,6 +138,14 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
                 final SheetInfoDialog sheetInfoDialog = new SheetInfoDialog(getApplicationContext(), sheet);
                 sheetInfoDialog.show(getSupportFragmentManager(),"dialog");
                 break;
+            case R.id.tabAction_edit:
+                // Close the player: the tune may change, the list is refreshed on return
+                this.stop();
+                final Intent editIntent = new Intent(getApplicationContext(), EditorActivity.class);
+                editIntent.putExtra(EditorActivity.EXTRA_SHEET, sheet);
+                startActivity(editIntent);
+                finish();
+                break;
             case android.R.id.home:
                 this.stop();
                 finish();
@@ -252,6 +260,15 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
     public boolean onCreateOptionsMenu(Menu menu) {
         final MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.tab_menu, menu);
+        // Saved user tunes can be edited, built-in tunes copied into the editor.
+        // Hidden for the unsaved tune opened from the editor itself.
+        final MenuItem edit = menu.findItem(R.id.tabAction_edit);
+        if (sheet == null || MusicSheet.PREVIEW_FILE.equals(sheet.getFile())) {
+            edit.setVisible(false);
+        } else if (!sheet.isUserTune()) {
+            edit.setTitle(R.string.menu_copy_to_editor);
+            edit.setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+        }
         return true;
     }
 
