@@ -79,4 +79,31 @@
     <string name="menu_copy_to_editor">Copy into the editor</string>
     <string name="main_longpress_delete">Delete</string>
     <string name="main_longpress_copy">Copy into the editor</string>
+
+    <!-- Share / import -->
+    <string name="menu_share">Share (QR code)</string>
+    <string name="menu_new_tune">New tune</string>
+    <string name="menu_import_scan">Scan a QR code</string>
+    <string name="menu_import_image">Import a QR code image</string>
+    <string name="menu_import_clipboard">Paste a tune</string>
+    <string name="share_activity_title">Share a tune</string>
+    <string name="share_qr_description">QR code of the tune</string>
+    <string name="share_explanation">Scan this code from Tin Whistle Tabs on another phone (+ then Scan a QR code), or send it as an image.</string>
+    <string name="share_send_image">Send the QR code</string>
+    <string name="share_send_text">Send as text (ABC)</string>
+    <string name="share_error">Could not share: %1$s</string>
+    <string name="share_error_too_long">This tune is too long for a QR code. Send it as text instead.</string>
+    <string name="import_scan_prompt">Point the camera at the tune QR code</string>
+    <string name="import_error">Cannot import: %1$s</string>
+    <string name="import_error_no_qr">No QR code found in this image.</string>
+    <string name="import_error_clipboard_empty">The clipboard does not contain a tune.</string>
+
+    <!-- Backup -->
+    <string name="menu_export_backup">Export my tunes and favourites</string>
+    <string name="menu_import_backup">Restore a backup</string>
+    <string name="backup_exported">Backup saved: %1$d tunes, %2$d favourites</string>
+    <string name="backup_restore_confirm">Restore %1$d tunes and %2$d favourites? Tunes already restored from this backup are replaced, your other tunes are kept.</string>
+    <string name="backup_restore">Restore</string>
+    <string name="backup_restored">%1$d tunes and %2$d favourites restored</string>
+    <string name="backup_error">Backup error: %1$s</string>
 </resources>

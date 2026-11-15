@@ -4,8 +4,8 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "fr.charleslabs.tinwhistletabs"
-        minSdkVersion 16
+        applicationId "fr.salquier.tinwhistletabs"
+        minSdkVersion 19
         targetSdkVersion 33
         versionCode 38
         versionName "1.9.24"
@@ -13,8 +13,27 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Stable signing key, so that each new APK installs as an update and keeps the user's data.
+    // CI provides the keystore through repository secrets (see .github/workflows/android-build.yml).
+    // Without it (local builds), the default debug key of the machine is used.
+    def signingKeystore = System.getenv("SIGNING_KEYSTORE_PATH")
+    signingConfigs {
+        stable {
+            if (signingKeystore) {
+                storeFile file(signingKeystore)
+                storePassword System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            if (signingKeystore) signingConfig signingConfigs.stable
+        }
         release {
+            if (signingKeystore) signingConfig signingConfigs.stable
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -28,6 +47,10 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    // QR codes. zxing core 3.3.x keeps Android < 7 support (3.4 needs API 24), see
+    // https://github.com/journeyapps/zxing-android-embedded#older-sdk-versions
+    implementation('com.journeyapps:zxing-android-embedded:4.3.0') { transitive = false }
+    implementation 'com.google.zxing:core:3.3.0'
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20231013'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

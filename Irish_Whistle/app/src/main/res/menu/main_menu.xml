@@ -5,12 +5,35 @@
         android:id="@+id/mainAction_add"
         android:title="@string/menu_add_tune"
         android:icon="@drawable/ic_add"
-        app:showAsAction="always" />
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/mainAction_new"
+                android:title="@string/menu_new_tune" />
+            <item
+                android:id="@+id/mainAction_scan"
+                android:title="@string/menu_import_scan" />
+            <item
+                android:id="@+id/mainAction_importImage"
+                android:title="@string/menu_import_image" />
+            <item
+                android:id="@+id/mainAction_importClipboard"
+                android:title="@string/menu_import_clipboard" />
+        </menu>
+    </item>
     <item
         android:id="@+id/mainAction_about"
         android:title="@string/menu_about"
         android:icon="@drawable/ic_more"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/mainAction_exportBackup"
+        android:title="@string/menu_export_backup"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/mainAction_importBackup"
+        android:title="@string/menu_import_backup"
+        app:showAsAction="never" />
     <item android:id="@+id/mainAction_search"
         android:title="@string/menu_search_by_title"
         android:icon="@drawable/ic_search"
