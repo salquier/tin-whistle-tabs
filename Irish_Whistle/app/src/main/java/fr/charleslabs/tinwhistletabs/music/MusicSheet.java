@@ -7,6 +7,11 @@ import java.io.Serializable;
 import java.util.List;
 
 public class MusicSheet implements Serializable {
+    /** File prefix of tunes created by the user in the editor (no pre-generated note file). */
+    public static final String USER_TUNE_PREFIX = "u_";
+    /** File id of the unsaved tune opened from the editor with "Try the tabs". */
+    public static final String PREVIEW_FILE = USER_TUNE_PREFIX + "preview";
+
     // Constants
     /* final static public int DIFFICULTY_EASY = 0,
             DIFFICULTY_MEDIUM = 1,
@@ -46,6 +51,36 @@ public class MusicSheet implements Serializable {
         if (jsonObject.has("whistle")) this.whistle = jsonObject.getString("whistle");
         else this.whistle = "D";
         //if (jsonObject.has("tempo")) this.tempo = jsonObject.getInt("tempo");
+    }
+
+    /** Create a user tune (edited in the app). Notes are computed from the ABC at opening. */
+    public MusicSheet(String title, String type, String abc, String whistle, String file) {
+        this.title = title;
+        this.type = type;
+        this.abc = abc;
+        this.whistle = whistle;
+        this.file = file;
+        this.author = null;
+        this.sheet_author = null;
+        this.license = null;
+        this.key = MusicSettings.DEFAULT_KEY;
+    }
+
+    public JSONObject toJSON() throws JSONException {
+        final JSONObject o = new JSONObject();
+        o.put("title", title);
+        o.put("type", type);
+        o.put("whistle", whistle);
+        o.put("abc", abc);
+        o.put("file", file);
+        if (author != null) o.put("author", author);
+        if (sheet_author != null) o.put("sheet_author", sheet_author);
+        if (license != null) o.put("license", license);
+        return o;
+    }
+
+    public boolean isUserTune() {
+        return file.startsWith(USER_TUNE_PREFIX);
     }
 
     public void transposeKey(final List<MusicNote> notes, final String oldKey, final String newKey){

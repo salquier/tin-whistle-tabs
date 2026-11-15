@@ -12,6 +12,9 @@
             android:name=".SheetActivity"
             android:launchMode="singleInstance" />
         <activity
+            android:name=".EditorActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".TabActivity"
             android:launchMode="singleInstance" />
         <activity

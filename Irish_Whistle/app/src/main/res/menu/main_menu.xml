@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/mainAction_add"
+        android:title="@string/menu_add_tune"
+        android:icon="@drawable/ic_add"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/mainAction_about"
         android:title="@string/menu_about"
         android:icon="@drawable/ic_more"
