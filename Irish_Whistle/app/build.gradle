@@ -33,8 +33,12 @@ android {
             if (signingKeystore) signingConfig signingConfigs.stable
         }
         release {
-            if (signingKeystore) signingConfig signingConfigs.stable
-            minifyEnabled true
+            // Without the stable key (local builds, PRs from forks) use the debug key so the
+            // APK can still be installed for testing
+            signingConfig signingKeystore ? signingConfigs.stable : signingConfigs.debug
+            // Code shrinking off: R8 could remove classes used by reflection (ZXing scanner,
+            // serialized tunes) and the crash would only show on a device
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }

@@ -14,7 +14,7 @@ This repo contains the Android Studio project and the database generator.
 
 This fork preserves the original project attribution and is maintained by Guillaume Jambet.
 
-Every push to `master` automatically increments the patch component of the application version, increments `versionCode`, builds the debug APK, and publishes a GitHub prerelease named after that version (for example, `1.9.13`) with a matching tag (for example, `v1.9.13`).
+Every push to `master` automatically increments the patch component of the application version, increments `versionCode`, builds the release APK (signed with the stable key, see below), and publishes a GitHub release named after that version (for example, `1.9.13`) with a matching tag (for example, `v1.9.13`) and the APK `TinWhistleTabs-<version>.apk`.
 
 
 The fork uses its own application id, `fr.salquier.tinwhistletabs`, so it can be installed next to the original Play Store app.
