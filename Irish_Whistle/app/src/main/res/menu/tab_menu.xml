@@ -7,6 +7,10 @@
         android:icon="@drawable/ic_edit"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/tabAction_share"
+        android:title="@string/menu_share"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/tabAction_tempo"
         android:title="@string/menu_tempo"
         android:icon="@drawable/ic_timer"

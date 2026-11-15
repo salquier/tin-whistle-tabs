@@ -5,7 +5,22 @@
         android:id="@+id/mainAction_add"
         android:title="@string/menu_add_tune"
         android:icon="@drawable/ic_add"
-        app:showAsAction="always" />
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/mainAction_new"
+                android:title="@string/menu_new_tune" />
+            <item
+                android:id="@+id/mainAction_scan"
+                android:title="@string/menu_import_scan" />
+            <item
+                android:id="@+id/mainAction_importImage"
+                android:title="@string/menu_import_image" />
+            <item
+                android:id="@+id/mainAction_importClipboard"
+                android:title="@string/menu_import_clipboard" />
+        </menu>
+    </item>
     <item
         android:id="@+id/mainAction_about"
         android:title="@string/menu_about"

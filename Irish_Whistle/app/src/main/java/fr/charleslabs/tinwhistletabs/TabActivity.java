@@ -138,6 +138,12 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
                 final SheetInfoDialog sheetInfoDialog = new SheetInfoDialog(getApplicationContext(), sheet);
                 sheetInfoDialog.show(getSupportFragmentManager(),"dialog");
                 break;
+            case R.id.tabAction_share:
+                this.stop();
+                final Intent shareIntent = new Intent(getApplicationContext(), ShareActivity.class);
+                shareIntent.putExtra(ShareActivity.EXTRA_SHEET, sheet);
+                startActivity(shareIntent);
+                break;
             case R.id.tabAction_edit:
                 // Close the player: the tune may change, the list is refreshed on return
                 this.stop();

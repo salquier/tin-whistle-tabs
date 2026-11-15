@@ -22,6 +22,12 @@ Tunes can be added directly from the app: tap **+** in the main screen, type the
 
 To modify a saved tune, open it and tap **Edit** (pencil), or long press it in the list (edit or delete). Built-in tunes can be copied into the editor the same way. User tunes are stored on the device (`files/user_tunes.json`).
 
+## Sharing tunes
+
+Open a tune and choose **Share (QR code)** in the menu (or long press it in the list): the app shows a QR code that another phone can scan, and can send it as an image or send the tune as ABC text. To import, tap **+** in the main screen: *Scan a QR code* (camera), *Import a QR code image* (photo or screenshot) or *Paste a tune* (ABC text or tune code from the clipboard). Text and QR images shared from other apps can also be sent directly to Tin Whistle Tabs. Imported tunes open in the editor to be checked and saved.
+
+The QR code contains `TWT1:` followed by the compressed title, type and ABC (deflate + base64url), see `TuneShareCodec`. QR codes use [ZXing](https://github.com/zxing/zxing) and [zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded) (Apache 2.0). The scanner requires Android 4.4 (API 19) or later.
+
 The conversion from ABC to notes is done in the app by `AbcParser` (a Java port of the `abc2midi` + `abc2db.py` pipeline). Its unit test checks it against the pre-generated database: run `./gradlew test` in `Irish_Whistle`.
 
 ## ToDo
@@ -47,5 +53,6 @@ The database generator uses:
 
 The app uses:
 * abcjs (MIT, https://github.com/paulrosen/abcjs)
+* ZXing and zxing-android-embedded (Apache 2.0)
 * Tin Whistle Tab font (© Blayne Chastain, www.blaynechastain.com)
 * Uncial Antiqua font (SIL Open Font License, Version 1.1)
