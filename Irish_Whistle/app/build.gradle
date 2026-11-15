@@ -4,7 +4,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        applicationId "fr.charleslabs.tinwhistletabs"
+        applicationId "fr.salquier.tinwhistletabs"
         minSdkVersion 19
         targetSdkVersion 33
         versionCode 38
@@ -13,8 +13,27 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Stable signing key, so that each new APK installs as an update and keeps the user's data.
+    // CI provides the keystore through repository secrets (see .github/workflows/android-build.yml).
+    // Without it (local builds), the default debug key of the machine is used.
+    def signingKeystore = System.getenv("SIGNING_KEYSTORE_PATH")
+    signingConfigs {
+        stable {
+            if (signingKeystore) {
+                storeFile file(signingKeystore)
+                storePassword System.getenv("SIGNING_STORE_PASSWORD")
+                keyAlias System.getenv("SIGNING_KEY_ALIAS")
+                keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
+        debug {
+            if (signingKeystore) signingConfig signingConfigs.stable
+        }
         release {
+            if (signingKeystore) signingConfig signingConfigs.stable
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

@@ -113,6 +113,32 @@ public class MusicDB {
         }
     }
 
+    /** The user's own tunes (not the built-in ones). */
+    public List<MusicSheet> getUserTunes() {
+        return new ArrayList<>(userTunes);
+    }
+
+    /**
+     * Restore tunes from a backup: tunes with the same id are replaced, others are added.
+     * Returns the number of restored tunes.
+     */
+    public int restoreUserTunes(List<MusicSheet> tunes) throws IOException {
+        for (MusicSheet sheet : tunes) {
+            boolean replaced = false;
+            for (int i = 0; i < userTunes.size(); i++) {
+                if (userTunes.get(i).getFile().equals(sheet.getFile())) {
+                    userTunes.set(i, sheet);
+                    replaced = true;
+                    break;
+                }
+            }
+            if (!replaced) userTunes.add(sheet);
+        }
+        saveUserTunes();
+        rebuild();
+        return tunes.size();
+    }
+
     public static String newUserTuneId() {
         return MusicSheet.USER_TUNE_PREFIX + System.currentTimeMillis();
     }

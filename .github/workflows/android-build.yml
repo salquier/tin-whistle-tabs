@@ -73,12 +73,38 @@ jobs:
           SDKMANAGER="${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager"
           "$SDKMANAGER" "platforms;android-33" "build-tools;30.0.3"
 
+      - name: Set up signing key
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        shell: bash
+        run: |
+          if [[ -z "$SIGNING_KEYSTORE_BASE64" ]]; then
+            # Published APKs must always use the same key, otherwise they cannot update the app
+            if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/master" ]]; then
+              echo "::error::Missing SIGNING_KEYSTORE_BASE64 secret: releases must be signed with the stable key" >&2
+              exit 1
+            fi
+            echo "::warning::No signing secrets: this APK uses a temporary debug key and cannot update an installed app"
+            exit 0
+          fi
+          KEYSTORE="$RUNNER_TEMP/release.keystore"
+          echo "$SIGNING_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE"
+          echo "SIGNING_KEYSTORE_PATH=$KEYSTORE" >> "$GITHUB_ENV"
+
       - name: Run unit tests
         working-directory: Irish_Whistle
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: bash gradlew testDebugUnitTest --no-daemon
 
       - name: Build debug APK
         working-directory: Irish_Whistle
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: bash gradlew assembleDebug --no-daemon
 
       - name: Prepare APK

@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,14 +29,24 @@ import com.journeyapps.barcodescanner.ScanIntentResult;
 import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
 import java.util.List;
 
 import fr.charleslabs.tinwhistletabs.android.SheetsAdapter;
 import fr.charleslabs.tinwhistletabs.dialogs.AppCreditsDialog;
+import fr.charleslabs.tinwhistletabs.music.Backup;
 import fr.charleslabs.tinwhistletabs.music.MusicDB;
 import fr.charleslabs.tinwhistletabs.music.MusicSheet;
 import fr.charleslabs.tinwhistletabs.share.QrCodes;
 import fr.charleslabs.tinwhistletabs.share.TuneShareCodec;
+import fr.charleslabs.tinwhistletabs.utils.Utils;
 
 public class MainActivity extends AppCompatActivity  {
     public static final String EXTRA_SHEET= "fr.charleslabs.tinwhistletabs.SHEET";
@@ -52,6 +63,23 @@ public class MainActivity extends AppCompatActivity  {
                     if (result.getContents() != null) importText(result.getContents());
                 }
             });
+    // Backup: export to / import from a file chosen by the user
+    private final ActivityResultLauncher<String> exportLauncher =
+            registerForActivityResult(new ActivityResultContracts.CreateDocument("application/json"),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            if (uri != null) exportBackup(uri);
+                        }
+                    });
+    private final ActivityResultLauncher<String[]> restoreLauncher =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(),
+                    new ActivityResultCallback<Uri>() {
+                        @Override
+                        public void onActivityResult(Uri uri) {
+                            if (uri != null) readBackup(uri);
+                        }
+                    });
     private final ActivityResultLauncher<String> imageLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
                 @Override
@@ -123,6 +151,71 @@ public class MainActivity extends AppCompatActivity  {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         handleSharedIntent(intent);
+    }
+
+    // ================= Backup =================
+
+    private SharedPreferences favoritesPreferences() {
+        return getSharedPreferences(SheetsAdapter.FAVORITES_PREFERENCES, Context.MODE_PRIVATE);
+    }
+
+    private void exportBackup(Uri uri) {
+        try {
+            final List<String> favorites = new ArrayList<>();
+            for (Map.Entry<String, ?> e : favoritesPreferences().getAll().entrySet())
+                if (Boolean.TRUE.equals(e.getValue())) favorites.add(e.getKey());
+            final Backup backup = new Backup(MusicDB.getInstance(this).getUserTunes(), favorites);
+            OutputStream out;
+            try {
+                out = getContentResolver().openOutputStream(uri, "wt"); // truncate existing file
+            } catch (Exception e) {
+                out = getContentResolver().openOutputStream(uri);
+            }
+            if (out == null) throw new IOException("Cannot open the file");
+            try {
+                out.write(backup.toJson().getBytes(Charset.forName("UTF-8")));
+            } finally {
+                out.close();
+            }
+            Toast.makeText(this, getString(R.string.backup_exported, backup.tunes.size(),
+                    backup.favorites.size()), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Toast.makeText(this, getString(R.string.backup_error, e.getMessage()), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void readBackup(Uri uri) {
+        final Backup backup;
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) throw new IOException("Cannot open the file");
+            backup = Backup.fromJson(Utils.fileToString(in));
+        } catch (Exception e) {
+            Toast.makeText(this, getString(R.string.backup_error, e.getMessage()), Toast.LENGTH_LONG).show();
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.backup_restore_confirm, backup.tunes.size(), backup.favorites.size()))
+                .setNegativeButton(R.string.dialog_cancel, null)
+                .setPositiveButton(R.string.backup_restore, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        restoreBackup(backup);
+                    }
+                }).show();
+    }
+
+    private void restoreBackup(Backup backup) {
+        try {
+            MusicDB.getInstance(this).restoreUserTunes(backup.tunes);
+            final SharedPreferences.Editor editor = favoritesPreferences().edit();
+            for (String id : backup.favorites) editor.putBoolean(id, true);
+            editor.apply();
+            refreshList();
+            Toast.makeText(this, getString(R.string.backup_restored, backup.tunes.size(),
+                    backup.favorites.size()), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(this, getString(R.string.backup_error, e.getMessage()), Toast.LENGTH_LONG).show();
+        }
     }
 
     // ================= Import =================
@@ -301,6 +394,11 @@ public class MainActivity extends AppCompatActivity  {
             imageLauncher.launch("image/*");
         } else if (id == R.id.mainAction_importClipboard) {
             importClipboard();
+        } else if (id == R.id.mainAction_exportBackup) {
+            exportLauncher.launch("tin-whistle-tabs-backup-"
+                    + new SimpleDateFormat("yyyy-MM-dd", Locale.ROOT).format(new Date()) + ".json");
+        } else if (id == R.id.mainAction_importBackup) {
+            restoreLauncher.launch(new String[]{"application/json", "text/plain", "application/octet-stream"});
         } else if (item.getItemId() == R.id.mainAction_about) {
             DialogFragment dialogFragment = new AppCreditsDialog();
             dialogFragment.show(getSupportFragmentManager(),"dialog");

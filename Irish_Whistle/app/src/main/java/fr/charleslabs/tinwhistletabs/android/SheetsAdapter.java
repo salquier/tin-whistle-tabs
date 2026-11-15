@@ -25,7 +25,7 @@ import fr.charleslabs.tinwhistletabs.R;
 import fr.charleslabs.tinwhistletabs.music.MusicSheet;
 
 public class SheetsAdapter extends BaseAdapter implements Filterable {
-    private static final String FAVORITES_PREFERENCES = "favorite_sheets";
+    public static final String FAVORITES_PREFERENCES = "favorite_sheets";
 
     private final List<MusicSheet> sheets;
     private List<MusicSheet> sheetsFiltered;

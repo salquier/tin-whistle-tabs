@@ -16,6 +16,33 @@ This fork preserves the original project attribution and is maintained by Guilla
 
 Every push to `master` automatically increments the patch component of the application version, increments `versionCode`, builds the debug APK, and publishes a GitHub prerelease named after that version (for example, `1.9.13`) with a matching tag (for example, `v1.9.13`).
 
+
+The fork uses its own application id, `fr.salquier.tinwhistletabs`, so it can be installed next to the original Play Store app.
+
+### Signing key
+
+Android only installs an update signed with the same key as the installed app. The workflow signs APKs with a stable key stored in four repository secrets (Settings > Secrets and variables > Actions):
+
+| Secret | Value |
+| --- | --- |
+| `SIGNING_KEYSTORE_BASE64` | the keystore file, base64 encoded |
+| `SIGNING_STORE_PASSWORD` | keystore password |
+| `SIGNING_KEY_ALIAS` | key alias |
+| `SIGNING_KEY_PASSWORD` | key password |
+
+Create the key once (keep the keystore and passwords safe: losing them means users must uninstall to update):
+
+```sh
+keytool -genkeypair -v -keystore tinwhistletabs.keystore -alias tinwhistletabs \
+  -keyalg RSA -keysize 4096 -validity 10000 -dname "CN=Tin Whistle Tabs"
+base64 -w0 tinwhistletabs.keystore   # value of SIGNING_KEYSTORE_BASE64 (macOS: base64 -i tinwhistletabs.keystore)
+```
+
+Builds on `master` fail if the secrets are missing; pull request builds without them use a temporary key.
+
+### Backup
+
+Tunes created in the app and favourites are stored in the app's private storage and are deleted when the app is uninstalled. Use the menu (⋮) of the main screen: *Export my tunes and favourites* saves a JSON file, *Restore a backup* reads it back.
 ## Tune editor
 
 Tunes can be added directly from the app: tap **+** in the main screen, type the tune in [ABC notation](https://abcnotation.com/wiki/abc:standard:v2.1) (with the keyboard or the note palette) and save it. The score and the tin whistle tabs are updated live, the required whistle is chosen automatically, and *Try the tabs* opens the tune in the player before saving. Any ABC tune can be pasted (from thesession.org for example).
