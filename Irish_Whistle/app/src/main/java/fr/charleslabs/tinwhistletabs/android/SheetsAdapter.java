@@ -40,13 +40,29 @@ public class SheetsAdapter extends BaseAdapter implements Filterable {
         this.noResult = noResult;
         this.favoritePreferences = context.getSharedPreferences(
                 FAVORITES_PREFERENCES, Context.MODE_PRIVATE);
-        this.sheets = new ArrayList<>(sheets);
+        this.sheets = new ArrayList<>();
         this.originalPositions = new HashMap<>();
-        for (int position = 0; position < this.sheets.size(); position++) {
-            originalPositions.put(favoriteKey(this.sheets.get(position)), position);
-        }
-        sortFavoritesFirst(this.sheets);
+        setSheets(sheets);
         this.sheetsFiltered = new ArrayList<>(this.sheets);
+    }
+
+    private void setSheets(List<MusicSheet> newSheets) {
+        sheets.clear();
+        sheets.addAll(newSheets);
+        originalPositions.clear();
+        for (int position = 0; position < sheets.size(); position++) {
+            originalPositions.put(favoriteKey(sheets.get(position)), position);
+        }
+        sortFavoritesFirst(sheets);
+    }
+
+    /**
+     * Replace the tunes (some were added, edited or deleted) and keep the current search.
+     * The ListView keeps its scroll position, unlike when a new adapter is set.
+     */
+    public void updateSheets(List<MusicSheet> newSheets) {
+        setSheets(newSheets);
+        refreshFilteredSheets();
     }
 
     @Override

@@ -280,10 +280,13 @@ public class MainActivity extends AppCompatActivity  {
 
     private void refreshList() {
         final List<MusicSheet> listData = MusicDB.getInstance(this).musicDB;
-        adapter = new SheetsAdapter(this, listData, findViewById(R.id.noResultsFoundView));
-        listView.setAdapter(adapter);
-        if (searchView != null && searchView.getQuery().length() > 0)
-            adapter.getFilter().filter(searchView.getQuery());
+        if (adapter == null) {
+            adapter = new SheetsAdapter(this, listData, findViewById(R.id.noResultsFoundView));
+            listView.setAdapter(adapter);
+        } else {
+            // Update in place: keeps the scroll position and the current search
+            adapter.updateSheets(listData);
+        }
     }
 
     private void openEditor(MusicSheet sheet) {
