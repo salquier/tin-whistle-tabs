@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   build:
-    name: Build debug APK
+    name: Build APK
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -84,7 +84,7 @@ jobs:
               echo "::error::Missing SIGNING_KEYSTORE_BASE64 secret: releases must be signed with the stable key" >&2
               exit 1
             fi
-            echo "::warning::No signing secrets: this APK uses a temporary debug key and cannot update an installed app"
+            echo "::warning::No signing secrets: this APK uses the debug key and cannot update an installed app"
             exit 0
           fi
           KEYSTORE="$RUNNER_TEMP/release.keystore"
@@ -99,17 +99,17 @@ jobs:
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: bash gradlew testDebugUnitTest --no-daemon
 
-      - name: Build debug APK
+      - name: Build release APK
         working-directory: Irish_Whistle
         env:
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        run: bash gradlew assembleDebug --no-daemon
+        run: bash gradlew assembleRelease --no-daemon
 
       - name: Prepare APK
         run: |
-          cp Irish_Whistle/app/build/outputs/apk/debug/app-debug.apk             "TinWhistleTabs-${{ steps.version.outputs.version }}-debug.apk"
+          cp Irish_Whistle/app/build/outputs/apk/release/app-release.apk             "TinWhistleTabs-${{ steps.version.outputs.version }}.apk"
 
       - name: Commit version increment
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -123,8 +123,8 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tin-whistle-tabs-${{ steps.version.outputs.version }}-debug-apk
-          path: TinWhistleTabs-${{ steps.version.outputs.version }}-debug.apk
+          name: tin-whistle-tabs-${{ steps.version.outputs.version }}-apk
+          path: TinWhistleTabs-${{ steps.version.outputs.version }}.apk
           if-no-files-found: error
           retention-days: 30
 
@@ -136,6 +136,7 @@ jobs:
           name: ${{ steps.version.outputs.version }}
           target_commitish: master
           body: |
-            Automated debug APK for version `${{ steps.version.outputs.version }}`.
-          prerelease: true
-          files: TinWhistleTabs-${{ steps.version.outputs.version }}-debug.apk
+            APK for version `${{ steps.version.outputs.version }}`.
+          prerelease: false
+          make_latest: true
+          files: TinWhistleTabs-${{ steps.version.outputs.version }}.apk
