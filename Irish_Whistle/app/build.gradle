@@ -7,8 +7,8 @@ android {
         applicationId "fr.salquier.tinwhistletabs"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 39
-        versionName "1.9.25"
+        versionCode 40
+        versionName "1.9.26"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
