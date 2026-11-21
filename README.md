@@ -49,6 +49,10 @@ Tunes can be added directly from the app: tap **+** in the main screen, type the
 
 To modify a saved tune, open it and tap **Edit** (pencil), or long press it in the list (edit or delete). Built-in tunes can be copied into the editor the same way. User tunes are stored on the device (`files/user_tunes.json`).
 
+## Score with fingerings
+
+In a tune, the **Score** button shows the sheet music. Its menu option *Fingerings under the notes* writes the tin whistle fingering under each note (same fingerings as the tab view). The fingerings are added to the ABC as lyrics (`w:` lines) drawn with the tab font, see `AbcParser.annotateWithTabs`. The choice is remembered.
+
 ## Sharing tunes
 
 Open a tune and choose **Share (QR code)** in the menu (or long press it in the list): the app shows a QR code that another phone can scan, and can send it as an image or send the tune as ABC text. To import, tap **+** in the main screen: *Scan a QR code* (camera), *Import a QR code image* (photo or screenshot) or *Paste a tune* (ABC text or tune code from the clipboard). Text and QR images shared from other apps can also be sent directly to Tin Whistle Tabs. Imported tunes open in the editor to be checked and saved.

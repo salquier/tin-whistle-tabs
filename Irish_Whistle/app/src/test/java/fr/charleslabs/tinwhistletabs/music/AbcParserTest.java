@@ -75,6 +75,30 @@ public class AbcParserTest {
         assertEquals("54 56 58 59 61", pitches(r));
     }
 
+    @Test
+    public void annotateWithTabsPutsFingeringUnderEachNote() throws Exception {
+        final String abc = "X:1\nT:Test\nL:1/8\nK:D\n~D E [FA] | z G-G \"Am\"^c|\nw:old lyrics\n";
+        final String annotated = AbcParser.annotateWithTabs(abc, 30);
+        // One syllable per note: rests skipped, "*" for tied notes, chords use their highest
+        // note; old lyrics removed
+        assertEquals("X:1\n%%vocalfont TinWhistleTab 30\n%%staffsep 70\nT:Test\nL:1/8\nK:D\n"
+                + "~D E [FA] | z G-G \"Am\"^c|\nw: d e a g * c\n", annotated);
+        // Same notes once the annotations are added
+        assertEquals(pitches(AbcParser.parse(abc)), pitches(AbcParser.parse(annotated)));
+    }
+
+    @Test
+    public void annotatedBundledTunesStillParseTheSame() throws Exception {
+        final File raw = new File("src/main/res/raw");
+        final JSONArray db = new JSONArray(new String(Files.readAllBytes(
+                new File(raw, "db.json").toPath()), StandardCharsets.UTF_8));
+        for (int i = 0; i < db.length(); i++) {
+            final String abc = db.getJSONObject(i).getString("abc");
+            assertEquals(db.getJSONObject(i).getString("title"), pitches(AbcParser.parse(abc)),
+                    pitches(AbcParser.parse(AbcParser.annotateWithTabs(abc, 30))));
+        }
+    }
+
     @Test(expected = AbcParser.AbcParseException.class)
     public void noNotesIsAnError() throws Exception {
         AbcParser.parse("X:1\nT:Empty\nK:D\n");
