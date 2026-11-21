@@ -1,10 +1,30 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sheet Music</title>
+    <style>
+        /* Tin whistle fingerings drawn under the notes (score with tabs mode) */
+        @font-face { font-family: TinWhistleTab; src: url(tinwhistletab.ttf); }
+        /* The fingering glyphs rise above their text box: move them below the notes */
+        text[font-family="TinWhistleTab"] { transform: translateY(10px); }
+        body { margin: 0; background: #fff; }
+    </style>
 </head>
 <body>
 <div id="paper" style="width:100%"></div>
-</body>
 <script type="text/javascript" src="abcjs_basic_5.11.0-min.js"></script>
+<script type="text/javascript">
+    function render(abc) {
+        var draw = function () { ABCJS.renderAbc("paper", abc, {responsive: "resize"}); };
+        // The tab font must be loaded before abcjs measures the text
+        if (document.fonts && document.fonts.load) {
+            document.fonts.load("30px TinWhistleTab").then(draw, draw);
+        } else {
+            setTimeout(draw, 300);
+        }
+    }
+</script>
+</body>
 </html>

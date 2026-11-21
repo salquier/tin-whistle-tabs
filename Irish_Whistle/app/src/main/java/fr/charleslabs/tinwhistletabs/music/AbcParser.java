@@ -46,14 +46,18 @@ public final class AbcParser {
         public final String title;
         public final String rhythm;
         public final String composer;
+        /** Notes as written in the ABC text (repeats not expanded): {line, column, pitch, kind}. */
+        final List<int[]> writtenNotes;
 
-        Result(List<MusicNote> notes, int shift, String title, String rhythm, String composer) {
+        Result(List<MusicNote> notes, int shift, String title, String rhythm, String composer,
+               List<int[]> writtenNotes) {
             this.notes = notes;
             this.shift = shift;
             this.whistle = getWhistle(shift);
             this.title = title;
             this.rhythm = rhythm;
             this.composer = composer;
+            this.writtenNotes = writtenNotes;
         }
     }
 
@@ -91,7 +95,48 @@ public final class AbcParser {
         final List<MusicNote> notes = new ArrayList<>(cleaned.size());
         for (int[] n : cleaned)
             notes.add(new MusicNote(n[0] == 0 ? 0 : n[0] + shift, n[1]));
-        return new Result(notes, shift, tokenizer.title, tokenizer.rhythm, tokenizer.composer);
+        return new Result(notes, shift, tokenizer.title, tokenizer.rhythm, tokenizer.composer,
+                tokenizer.writtenNotes);
+    }
+
+    /** Font family used for the fingering annotations (declared in the score page). */
+    public static final String TAB_FONT = "TinWhistleTab";
+    private static final int NOTE_REST = 0, NOTE_NEW = 1, NOTE_TIED = 2;
+
+    /**
+     * Return the ABC with the tin whistle fingering of each note written below it, so that
+     * the score and the tabs are shown together. The fingerings are written as lyrics (a w:
+     * line after each music line) in the tab font: lyrics are aligned note by note and the
+     * renderer reserves room for them under the staff. Rests and grace notes are skipped by
+     * lyrics; tied notes get "*" (no syllable). Existing lyrics lines are removed, since
+     * they would be drawn with the tab font. Fingerings are those of the tab view.
+     */
+    public static String annotateWithTabs(String abc, int fontSize) throws AbcParseException {
+        final Result r = parse(abc);
+        final String[] lines = abc.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
+        final StringBuilder[] lyrics = new StringBuilder[lines.length];
+        for (int[] n : r.writtenNotes) {
+            if (lyrics[n[0]] == null) lyrics[n[0]] = new StringBuilder("w:");
+            lyrics[n[0]].append(' ').append(n[3] == NOTE_TIED ? "*"
+                    : new MusicNote(n[2] + r.shift, 0).toTab());
+        }
+        // Tab font for the lyrics, and more room between systems for the tall fingerings
+        final String fontLine = "%%vocalfont " + TAB_FONT + " " + fontSize + "\n%%staffsep 70";
+        final StringBuilder result = new StringBuilder();
+        boolean fontAdded = false;
+        for (int i = 0; i < lines.length; i++) {
+            if (lines[i].startsWith("w:")) continue;
+            if (result.length() > 0) result.append('\n');
+            result.append(lines[i]);
+            if (lyrics[i] != null) result.append('\n').append(lyrics[i]);
+            // Formatting directive right after the X: line, or at the top
+            if (!fontAdded && lines[i].startsWith("X:")) {
+                result.append('\n').append(fontLine);
+                fontAdded = true;
+            }
+        }
+        if (!fontAdded) result.insert(0, fontLine + "\n");
+        return result.toString();
     }
 
     // ===================== Transposition (port of abc2db.py) =====================
@@ -217,7 +262,9 @@ public final class AbcParser {
 
     private static final class Tokenizer {
         final List<Event> events = new ArrayList<>();
+        final List<int[]> writtenNotes = new ArrayList<>();
         String title = null, rhythm = null, composer = null;
+        int lineIndex = -1;
 
         // Musical state
         double unitLength = -1; // fraction of a whole note, -1 = not set yet
@@ -246,6 +293,7 @@ public final class AbcParser {
         void run(String abc) {
             final String[] lines = abc.replace("\r\n", "\n").replace('\r', '\n').split("\n");
             for (String line : lines) {
+                lineIndex++;
                 if (finished) break;
                 if (line.startsWith("%%")) continue;
                 line = stripComment(line);
@@ -584,12 +632,15 @@ public final class AbcParser {
         }
 
         private void note() {
+            final int start = pos;
             final double[] n = readNote();
             if (n == null) return;
-            addNote((int) n[0], n[1]);
+            final int kind = addNote((int) n[0], n[1]);
+            if (kind != NOTE_REST) writtenNotes.add(new int[]{lineIndex, start, (int) n[0], kind});
         }
 
-        private void addNote(int pitch, double mult) {
+        /** Returns NOTE_NEW, NOTE_TIED (merged into the previous note) or NOTE_REST (rest or ignored). */
+        private int addNote(int pitch, double mult) {
             double len = mult * unit() * msPerWhole();
             len *= brokenNext;
             brokenNext = 1.0;
@@ -597,11 +648,11 @@ public final class AbcParser {
                 len *= tupletFactor;
                 tupletLeft--;
             }
-            if (ignoreVoice) return;
+            if (ignoreVoice) return NOTE_REST;
             if (tiePending && lastNote != null && lastNote.pitch == pitch && pitch != 0) {
                 lastNote.length += len;
                 tiePending = false;
-                return;
+                return NOTE_TIED;
             }
             tiePending = false;
             final Event ev = new Event(EV_NOTE);
@@ -609,6 +660,7 @@ public final class AbcParser {
             ev.length = len;
             events.add(ev);
             lastNote = ev;
+            return pitch != 0 ? NOTE_NEW : NOTE_REST;
         }
 
         private void bracket() {
@@ -634,6 +686,7 @@ public final class AbcParser {
         }
 
         private void chord() {
+            final int start = pos;
             pos++; // '['
             int best = -1;
             double firstLen = -1;
@@ -653,7 +706,10 @@ public final class AbcParser {
             }
             if (pos < line.length() && line.charAt(pos) == ']') pos++;
             final double outer = readLength();
-            if (best >= 0) addNote(best, (firstLen < 0 ? 1 : firstLen) * outer);
+            if (best >= 0) {
+                final int kind = addNote(best, (firstLen < 0 ? 1 : firstLen) * outer);
+                if (kind != NOTE_REST) writtenNotes.add(new int[]{lineIndex, start, best, kind});
+            }
         }
 
         private void bar() {

@@ -33,9 +33,12 @@
         <activity
             android:name=".TabActivity"
             android:launchMode="singleInstance" />
+        <!-- singleTask, not singleInstance: activities started from a singleInstance activity
+             go to a new task and Android immediately cancels their result, which broke the
+             QR scan, QR image import and backup pickers -->
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

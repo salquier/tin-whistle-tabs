@@ -106,4 +106,8 @@
     <string name="backup_restore">Restore</string>
     <string name="backup_restored">%1$d tunes and %2$d favourites restored</string>
     <string name="backup_error">Backup error: %1$s</string>
+
+    <!-- Score with tabs -->
+    <string name="sheet_show_tabs">Fingerings under the notes</string>
+    <string name="sheet_tabs_error">Cannot show the fingerings: %1$s</string>
 </resources>
