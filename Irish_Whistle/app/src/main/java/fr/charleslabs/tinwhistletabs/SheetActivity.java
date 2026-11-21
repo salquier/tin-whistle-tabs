@@ -21,7 +21,7 @@ import fr.charleslabs.tinwhistletabs.music.AbcParser;
 public class SheetActivity extends AppCompatActivity {
     private static final String PREFERENCES = "settings";
     private static final String PREF_SCORE_TABS = "score_with_tabs";
-    private static final int TAB_FONT_SIZE = 30;
+    private static final int TAB_FONT_SIZE = 54;
 
     private String abc;
     private WebView webView;
