@@ -81,7 +81,7 @@ public class AbcParserTest {
         final String annotated = AbcParser.annotateWithTabs(abc, 30);
         // One syllable per note: rests skipped, "*" for tied notes, chords use their highest
         // note; old lyrics removed
-        assertEquals("X:1\n%%vocalfont TinWhistleTab 30\n%%staffsep 70\nT:Test\nL:1/8\nK:D\n"
+        assertEquals("X:1\n%%vocalfont TinWhistleTab 30\n%%staffsep 60\nT:Test\nL:1/8\nK:D\n"
                 + "~D E [FA] | z G-G \"Am\"^c|\nw: d e a g * c\n", annotated);
         // Same notes once the annotations are added
         assertEquals(pitches(AbcParser.parse(abc)), pitches(AbcParser.parse(annotated)));

@@ -121,7 +121,8 @@ public final class AbcParser {
                     : new MusicNote(n[2] + r.shift, 0).toTab());
         }
         // Tab font for the lyrics, and more room between systems for the tall fingerings
-        final String fontLine = "%%vocalfont " + TAB_FONT + " " + fontSize + "\n%%staffsep 70";
+        final String fontLine = "%%vocalfont " + TAB_FONT + " " + fontSize
+                + "\n%%staffsep " + (fontSize * 2);
         final StringBuilder result = new StringBuilder();
         boolean fontAdded = false;
         for (int i = 0; i < lines.length; i++) {

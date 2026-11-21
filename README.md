@@ -55,7 +55,7 @@ In a tune, the **Score** button shows the sheet music. Its menu option *Fingerin
 
 ## Sharing tunes
 
-Open a tune and choose **Share (QR code)** in the menu (or long press it in the list): the app shows a QR code that another phone can scan, and can send it as an image or send the tune as ABC text. To import, tap **+** in the main screen: *Scan a QR code* (camera), *Import a QR code image* (photo or screenshot) or *Paste a tune* (ABC text or tune code from the clipboard). Text and QR images shared from other apps can also be sent directly to Tin Whistle Tabs. Imported tunes open in the editor to be checked and saved.
+Open a tune and choose **Share (QR code)** in the menu (or long press it in the list): the app shows a QR code that another phone can scan, and can send it as an image or send the tune as ABC text. To import, tap **+** in the main screen: *Scan a QR code* (camera), *Import a QR code image* (photo or screenshot) or *Paste a tune* (ABC text or tune code from the clipboard). Text and QR images shared from other apps can also be sent directly to Tin Whistle Tabs. Imported tunes open in the editor to be checked and saved. New tunes (created, copied or imported) are added to the favourites.
 
 The QR code contains `TWT1:` followed by the compressed title, type and ABC (deflate + base64url), see `TuneShareCodec`. QR codes use [ZXing](https://github.com/zxing/zxing) and [zxing-android-embedded](https://github.com/journeyapps/zxing-android-embedded) (Apache 2.0). The scanner requires Android 4.4 (API 19) or later.
 

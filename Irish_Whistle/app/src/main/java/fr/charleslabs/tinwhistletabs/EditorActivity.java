@@ -1,6 +1,7 @@
 package fr.charleslabs.tinwhistletabs;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import fr.charleslabs.tinwhistletabs.android.SheetsAdapter;
 import fr.charleslabs.tinwhistletabs.music.AbcParser;
 import fr.charleslabs.tinwhistletabs.music.MusicDB;
 import fr.charleslabs.tinwhistletabs.music.MusicSheet;
@@ -240,6 +242,11 @@ public class EditorActivity extends AppCompatActivity {
         try {
             final MusicSheet sheet = buildSheet(editedFile != null ? editedFile : MusicDB.newUserTuneId());
             MusicDB.getInstance(this).saveUserTune(sheet);
+            // New tunes (created, copied or imported) go to the favourites, at the top of the list
+            if (editedFile == null) {
+                getSharedPreferences(SheetsAdapter.FAVORITES_PREFERENCES, Context.MODE_PRIVATE)
+                        .edit().putBoolean(sheet.getFile(), true).apply();
+            }
             Toast.makeText(this, getString(R.string.editor_saved, sheet.getTitle()), Toast.LENGTH_SHORT).show();
             dirty = false;
             finish();

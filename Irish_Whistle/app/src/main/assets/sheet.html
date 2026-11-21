@@ -8,7 +8,7 @@
         /* Tin whistle fingerings drawn under the notes (score with tabs mode) */
         @font-face { font-family: TinWhistleTab; src: url(tinwhistletab.ttf); }
         /* The fingering glyphs rise above their text box: move them below the notes */
-        text[font-family="TinWhistleTab"] { transform: translateY(10px); }
+        text[font-family="TinWhistleTab"] { transform: translateY(0.35em); }
         body { margin: 0; background: #fff; }
     </style>
 </head>
@@ -20,7 +20,7 @@
         var draw = function () { ABCJS.renderAbc("paper", abc, {responsive: "resize"}); };
         // The tab font must be loaded before abcjs measures the text
         if (document.fonts && document.fonts.load) {
-            document.fonts.load("30px TinWhistleTab").then(draw, draw);
+            document.fonts.load("54px TinWhistleTab").then(draw, draw);
         } else {
             setTimeout(draw, 300);
         }
