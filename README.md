@@ -85,5 +85,6 @@ The database generator uses:
 The app uses:
 * abcjs (MIT, https://github.com/paulrosen/abcjs)
 * ZXing and zxing-android-embedded (Apache 2.0)
+* Piccolo samples from the FluidR3_GM SoundFont by Frank Wen (MIT, see `assets/licenses/FluidR3_GM.txt`), exported with `database_generator/export_samples.py`
 * Tin Whistle Tab font (© Blayne Chastain, www.blaynechastain.com)
 * Uncial Antiqua font (SIL Open Font License, Version 1.1)
