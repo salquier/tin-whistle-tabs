@@ -94,6 +94,7 @@ public class SheetsAdapter extends BaseAdapter implements Filterable {
             viewHolder.favoriteToggle = convertView.findViewById(
                     R.id.mainActivity_favoriteToggle);
             viewHolder.sheetName = convertView.findViewById(R.id.mainActivity_SheetName);
+            viewHolder.subtitle = convertView.findViewById(R.id.mainActivity_SheetSubtitle);
             viewHolder.whistleKeyBadge = convertView.findViewById(
                     R.id.mainActivity_whistleKeyBadge);
             convertView.setTag(viewHolder);
@@ -117,6 +118,7 @@ public class SheetsAdapter extends BaseAdapter implements Filterable {
                 });
 
         viewHolder.sheetName.setText(sheet.getTitle());
+        viewHolder.subtitle.setText(subtitle(sheet));
         viewHolder.whistleKeyBadge.setText(sheet.getWhistle());
         viewHolder.whistleKeyBadge.setContentDescription(
                 context.getResources().getString(
@@ -124,6 +126,18 @@ public class SheetsAdapter extends BaseAdapter implements Filterable {
                         sheet.getWhistle()));
 
         return convertView;
+    }
+
+    /** "Reel · Composer": type, then composer when known. */
+    static String subtitle(MusicSheet sheet) {
+        final StringBuilder sb = new StringBuilder();
+        if (sheet.getType() != null) sb.append(sheet.getType());
+        final String author = sheet.getAuthor();
+        if (author != null && !author.trim().isEmpty()) {
+            if (sb.length() > 0) sb.append(" · ");
+            sb.append(author.trim());
+        }
+        return sb.toString();
     }
 
     private boolean isFavorite(MusicSheet sheet) {
@@ -208,6 +222,7 @@ public class SheetsAdapter extends BaseAdapter implements Filterable {
     private static class ComponentViewHolder {
         CheckBox favoriteToggle;
         TextView sheetName;
+        TextView subtitle;
         TextView whistleKeyBadge;
     }
 }

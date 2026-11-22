@@ -55,12 +55,17 @@ public class MusicSheet implements Serializable {
 
     /** Create a user tune (edited in the app). Notes are computed from the ABC at opening. */
     public MusicSheet(String title, String type, String abc, String whistle, String file) {
+        this(title, type, abc, whistle, file, null);
+    }
+
+    /** User tune with a composer (C: field of the ABC), may be null. */
+    public MusicSheet(String title, String type, String abc, String whistle, String file, String author) {
         this.title = title;
         this.type = type;
         this.abc = abc;
         this.whistle = whistle;
         this.file = file;
-        this.author = null;
+        this.author = author == null || author.trim().isEmpty() ? null : author.trim();
         this.sheet_author = null;
         this.license = null;
         this.key = MusicSettings.DEFAULT_KEY;

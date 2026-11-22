@@ -235,7 +235,8 @@ public class EditorActivity extends AppCompatActivity {
         String title = titleView.getText().toString().trim();
         if (title.isEmpty() && r.title != null) title = r.title.trim();
         if (title.isEmpty()) throw new AbcParser.AbcParseException(getString(R.string.editor_error_no_title));
-        return new MusicSheet(title, (String) typeView.getSelectedItem(), abc, r.whistle, file);
+        return new MusicSheet(title, (String) typeView.getSelectedItem(), abc, r.whistle, file,
+                r.composer);
     }
 
     private void save() {
