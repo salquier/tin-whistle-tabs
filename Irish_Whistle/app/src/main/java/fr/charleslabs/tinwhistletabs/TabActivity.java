@@ -335,7 +335,6 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
             warnOutOfRange();
         }
     }
-    }
 
     // Scale tab on pinch
     @Override
