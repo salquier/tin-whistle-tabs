@@ -28,39 +28,14 @@ public class MusicPlayer {
     private MusicPlayer(){}
 
     public static byte[] genMusic(List<MusicNote> notes, float tempoModifier){
-        // Compute length of music
-        float lengthInS = 0;
-        for(MusicNote note : notes) {
-            lengthInS += note.getLengthInS(tempoModifier);
+        final float[] frequencies = new float[notes.size()];
+        final int[] lengths = new int[notes.size()];
+        for (int i = 0; i < notes.size(); i++) {
+            final MusicNote note = notes.get(i);
+            frequencies[i] = note.isRest() ? 0f : note.getFrequency();
+            lengths[i] = (int) (note.getLengthInS(tempoModifier) * SAMPLE_RATE);
         }
-
-        final float[] music = new float[(int)(lengthInS*SAMPLE_RATE)];
-        int index = 0;
-        for(MusicNote note : notes) {
-            index += genNote(note,tempoModifier,music,index);
-        }
-
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.1f), 0.2f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.2f), 0.1f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.3f), 0.05f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.4f), 0.05f);
-
-        return toneToBytePCM(music);
-    }
-
-    private static int genNote(MusicNote note, float tempoModifier, float[] music, int offset){
-        int numSamples = (int)(note.getLengthInS(tempoModifier)*SAMPLE_RATE);
-
-        if (numSamples+offset >= music.length -1)
-            numSamples = music.length - offset -1;
-
-        if (note.isRest())
-            for (int i = 0; i < numSamples; ++i)
-                music[i+offset] = 0;
-        else
-            TinWhistleSynth.genNote(note.getFrequency(),numSamples,music,offset,SAMPLE_RATE);
-
-        return numSamples;
+        return toneToBytePCM(TinWhistleSynth.render(frequencies, lengths, SAMPLE_RATE));
     }
 
     // Media controls: set, play, pause, stop, clear
