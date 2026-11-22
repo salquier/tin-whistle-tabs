@@ -10,8 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SheetActivity"
-            android:launchMode="singleInstance" />
+            android:name=".SheetActivity" />
         <activity android:name=".ShareActivity" />
         <!-- Scanner from zxing-android-embedded, allowed in portrait -->
         <activity
@@ -31,14 +30,13 @@
             android:name=".EditorActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".TabActivity"
-            android:launchMode="singleInstance" />
-        <!-- singleTask, not singleInstance: activities started from a singleInstance activity
-             go to a new task and Android immediately cancels their result, which broke the
-             QR scan, QR image import and backup pickers -->
+            android:name=".TabActivity" />
+        <!-- Standard launch mode for all activities: the tune, score and editor screens stay
+             in the same task as the list, so Back always returns to the list (singleInstance put
+             each screen alone in its own task, singleInstance also cancelled picker results, and
+             singleTask clears the screens above the list when the app is relaunched from its icon) -->
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

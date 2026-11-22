@@ -77,7 +77,8 @@ public class SheetActivity extends AppCompatActivity {
         String toRender = abc;
         if (showTabs) {
             try {
-                toRender = AbcParser.annotateWithTabs(abc, TAB_FONT_SIZE);
+                toRender = AbcParser.annotateWithTabs(abc, TAB_FONT_SIZE,
+                        getIntent().getIntExtra(TabActivity.EXTRA_TAB_SHIFT, 0));
             } catch (AbcParser.AbcParseException e) {
                 Toast.makeText(this, getString(R.string.sheet_tabs_error, e.getMessage()),
                         Toast.LENGTH_LONG).show();

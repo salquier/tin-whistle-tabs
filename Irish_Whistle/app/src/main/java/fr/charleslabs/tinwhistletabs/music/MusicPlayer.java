@@ -1,13 +1,18 @@
 package fr.charleslabs.tinwhistletabs.music;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.audiofx.PresetReverb;
 import android.os.Handler;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import fr.charleslabs.tinwhistletabs.music.synth.SampleSynth;
 import fr.charleslabs.tinwhistletabs.music.synth.TinWhistleSynth;
 
 public class MusicPlayer {
@@ -27,40 +32,30 @@ public class MusicPlayer {
     }
     private MusicPlayer(){}
 
-    public static byte[] genMusic(List<MusicNote> notes, float tempoModifier){
-        // Compute length of music
-        float lengthInS = 0;
-        for(MusicNote note : notes) {
-            lengthInS += note.getLengthInS(tempoModifier);
+    // Recorded instrument (piccolo samples); the synthesiser is used if it cannot be loaded
+    private static final String INSTRUMENT = "instruments/piccolo.bin";
+    private static SampleSynth sampler;
+
+    public static synchronized void loadInstrument(Context c) {
+        if (sampler != null) return;
+        try (InputStream in = new BufferedInputStream(c.getAssets().open(INSTRUMENT))) {
+            sampler = new SampleSynth(in);
+        } catch (IOException e) {
+            sampler = null;
         }
-
-        final float[] music = new float[(int)(lengthInS*SAMPLE_RATE)];
-        int index = 0;
-        for(MusicNote note : notes) {
-            index += genNote(note,tempoModifier,music,index);
-        }
-
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.1f), 0.2f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.2f), 0.1f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.3f), 0.05f);
-        TinWhistleSynth.reverb(music, (int)(SAMPLE_RATE*0.4f), 0.05f);
-
-        return toneToBytePCM(music);
     }
 
-    private static int genNote(MusicNote note, float tempoModifier, float[] music, int offset){
-        int numSamples = (int)(note.getLengthInS(tempoModifier)*SAMPLE_RATE);
-
-        if (numSamples+offset >= music.length -1)
-            numSamples = music.length - offset -1;
-
-        if (note.isRest())
-            for (int i = 0; i < numSamples; ++i)
-                music[i+offset] = 0;
-        else
-            TinWhistleSynth.genNote(note.getFrequency(),numSamples,music,offset,SAMPLE_RATE);
-
-        return numSamples;
+    public static byte[] genMusic(List<MusicNote> notes, float tempoModifier){
+        final float[] frequencies = new float[notes.size()];
+        final int[] lengths = new int[notes.size()];
+        for (int i = 0; i < notes.size(); i++) {
+            final MusicNote note = notes.get(i);
+            frequencies[i] = note.isRest() ? 0f : note.getFrequency();
+            lengths[i] = (int) (note.getLengthInS(tempoModifier) * SAMPLE_RATE);
+        }
+        return toneToBytePCM(sampler != null
+                ? sampler.render(frequencies, lengths, SAMPLE_RATE)
+                : TinWhistleSynth.render(frequencies, lengths, SAMPLE_RATE));
     }
 
     // Media controls: set, play, pause, stop, clear

@@ -35,6 +35,16 @@ public class BackupTest {
         assertEquals(0, read.tunes.size());
     }
 
+    @Test
+    public void composerIsKeptAndBlankComposerIgnored() throws Exception {
+        final MusicSheet withComposer = new MusicSheet("A", "Reel", "X:1\nK:D\nD|\n", "D", "u_1", " Ed Reavy ");
+        final MusicSheet blank = new MusicSheet("B", "Jig", "X:1\nK:D\nD|\n", "D", "u_2", "  ");
+        final Backup read = Backup.fromJson(new Backup(Arrays.asList(withComposer, blank),
+                Arrays.<String>asList()).toJson());
+        assertEquals("Ed Reavy", read.tunes.get(0).getAuthor());
+        assertEquals(null, read.tunes.get(1).getAuthor());
+    }
+
     @Test(expected = JSONException.class)
     public void otherJsonIsRejected() throws Exception {
         Backup.fromJson("{\"tunes\": []}");

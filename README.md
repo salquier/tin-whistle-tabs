@@ -49,6 +49,10 @@ Tunes can be added directly from the app: tap **+** in the main screen, type the
 
 To modify a saved tune, open it and tap **Edit** (pencil), or long press it in the list (edit or delete). Built-in tunes can be copied into the editor the same way. User tunes are stored on the device (`files/user_tunes.json`).
 
+## Playing with another whistle
+
+The **Whistle** menu of a tune sets the whistle you play (remembered for all tunes). By default the tabs are for the whistle recommended for the tune (badge in the list). With another whistle, the fingerings are transposed so that the tune sounds at the same pitch, for example a C whistle and a D whistle playing a duet; the octave is chosen to stay in the range of the whistle and avoid half-holed notes. Notes out of range are shown as `?`. Playback uses the sound of the chosen whistle, and the score with fingerings uses the same fingerings. See `WhistleTransposer`.
+
 ## Score with fingerings
 
 In a tune, the **Score** button shows the sheet music. Its menu option *Fingerings under the notes* writes the tin whistle fingering under each note (same fingerings as the tab view). The fingerings are added to the ABC as lyrics (`w:` lines) drawn with the tab font, see `AbcParser.annotateWithTabs`. The choice is remembered.
@@ -85,5 +89,6 @@ The database generator uses:
 The app uses:
 * abcjs (MIT, https://github.com/paulrosen/abcjs)
 * ZXing and zxing-android-embedded (Apache 2.0)
+* Piccolo samples from the FluidR3_GM SoundFont by Frank Wen (MIT, see `assets/licenses/FluidR3_GM.txt`), exported with `database_generator/export_samples.py`
 * Tin Whistle Tab font (© Blayne Chastain, www.blaynechastain.com)
 * Uncial Antiqua font (SIL Open Font License, Version 1.1)

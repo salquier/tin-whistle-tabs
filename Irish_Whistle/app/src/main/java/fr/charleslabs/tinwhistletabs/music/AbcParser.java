@@ -112,13 +112,19 @@ public final class AbcParser {
      * they would be drawn with the tab font. Fingerings are those of the tab view.
      */
     public static String annotateWithTabs(String abc, int fontSize) throws AbcParseException {
+        return annotateWithTabs(abc, fontSize, 0);
+    }
+
+    /** Same, with the fingerings transposed by {@code fingeringShift} semitones (other whistle). */
+    public static String annotateWithTabs(String abc, int fontSize, int fingeringShift)
+            throws AbcParseException {
         final Result r = parse(abc);
         final String[] lines = abc.replace("\r\n", "\n").replace('\r', '\n').split("\n", -1);
         final StringBuilder[] lyrics = new StringBuilder[lines.length];
         for (int[] n : r.writtenNotes) {
             if (lyrics[n[0]] == null) lyrics[n[0]] = new StringBuilder("w:");
             lyrics[n[0]].append(' ').append(n[3] == NOTE_TIED ? "*"
-                    : new MusicNote(n[2] + r.shift, 0).toTab());
+                    : new MusicNote(n[2] + r.shift + fingeringShift, 0).toTab());
         }
         // Tab font for the lyrics, and more room between systems for the tall fingerings
         final String fontLine = "%%vocalfont " + TAB_FONT + " " + fontSize
@@ -175,6 +181,11 @@ public final class AbcParser {
         for (int[] n : notes)
             if (n[0] != 0 && HALF_HOLED.contains(n[0] + shift)) return false;
         return true;
+    }
+
+    /** Inverse of {@link #getWhistle(int)}: shift (0-11) for a whistle name, -1 if unknown. */
+    public static int whistleShift(String whistle) {
+        return Arrays.asList(OFFSETS_D).indexOf(whistle);
     }
 
     public static String getWhistle(int shift) {
