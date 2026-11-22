@@ -83,19 +83,6 @@ public class MusicSheet implements Serializable {
         return file.startsWith(USER_TUNE_PREFIX);
     }
 
-    public void transposeKey(final List<MusicNote> notes, final String oldKey, final String newKey){
-        if (!oldKey.equals(newKey)) {
-            final int shift = MusicSettings.getShift(newKey) - MusicSettings.getShift(oldKey);
-            transpose(notes, shift);
-        }
-    }
-
-    private static void transpose(final List<MusicNote> notes, final int shift){
-        if(shift != 0)
-            for(MusicNote note : notes)
-                note.transpose(shift);
-    }
-
     public static String notesToTabs(final List<MusicNote> notes) {
         StringBuilder buffer = new StringBuilder();
         for (MusicNote note : notes) {

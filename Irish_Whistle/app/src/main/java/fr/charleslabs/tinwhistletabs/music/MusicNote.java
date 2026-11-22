@@ -71,4 +71,8 @@ public class MusicNote {
     int getPitch() {
         return pitch;
     }
+
+    int getDuration() {
+        return duration;
+    }
 }

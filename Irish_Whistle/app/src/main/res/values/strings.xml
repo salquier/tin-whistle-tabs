@@ -25,7 +25,13 @@
     <string name="dialog_set">Set</string>
 
     <!-- Key dialog -->
-    <string name="keyDialog_title">Change whistle key</string>
+    <string name="keyDialog_title">My whistle</string>
+    <string name="keyDialog_recommended">Recommended for this tune (%1$s)</string>
+    <string name="tab_whistle_subtitle">%1$s whistle</string>
+    <plurals name="tab_out_of_range">
+        <item quantity="one">%1$d note is out of the range of this whistle (shown as ?)</item>
+        <item quantity="other">%1$d notes are out of the range of this whistle (shown as ?)</item>
+    </plurals>
 
     <!-- Sheet info dialog -->
     <string name="sheetInfoDialog_title">About this music…</string>
@@ -48,7 +54,7 @@
     <string name="menu_about">About</string>
     <string name="menu_search_by_title">Search by title</string>
     <string name="menu_tempo">Tempo</string>
-    <string name="menu_key">Key</string>
+    <string name="menu_key">Whistle</string>
     <string name="mainActivity_request_a_tune">Request a tune…</string>
 
     <!-- Error messages -->

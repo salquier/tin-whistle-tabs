@@ -1,6 +1,7 @@
 package fr.charleslabs.tinwhistletabs;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,12 +34,17 @@ import fr.charleslabs.tinwhistletabs.music.MusicNote;
 import fr.charleslabs.tinwhistletabs.music.MusicPlayer;
 import fr.charleslabs.tinwhistletabs.music.MusicSettings;
 import fr.charleslabs.tinwhistletabs.music.MusicSheet;
+import fr.charleslabs.tinwhistletabs.music.WhistleTransposer;
 import fr.charleslabs.tinwhistletabs.utils.AndroidUtils;
 
 public class TabActivity extends AppCompatActivity implements TempoDialog.TempoChangeCallback,
         KeyDialog.KeyChangeCallback, SingleTapTouchListener.SingleTapCallback {
     public static final String EXTRA_ABC= "fr.charleslabs.tinwhistletabs.ABC";
     public static final String EXTRA_SHEET_TITLE= "fr.charleslabs.tinwhistletabs.SHEET_TITLE";
+    /** Semitones to add to the fingerings of the score (player's whistle). */
+    public static final String EXTRA_TAB_SHIFT = "fr.charleslabs.tinwhistletabs.TAB_SHIFT";
+    private static final String PREFERENCES = "settings";
+    private static final String PREF_MY_WHISTLE = "my_whistle";
     public static final float START_DELAY_AMOUNT = 1.5f; // s
     private static final int COUNTDOWN_STEPS = 3;
     private static final int SCROLL_DURATION = 750; // ms
@@ -48,7 +54,10 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
     private MusicSheet sheet = null;
     private int tempo = MusicSettings.DEFAULT_TEMPO;
     private Handler musicHandler = new Handler();
-    private List<MusicNote> notes;
+    private List<MusicNote> notes;          // what is played (sound of the player's whistle)
+    private List<MusicNote> storedNotes;    // fingerings for the recommended whistle
+    private String myWhistle = WhistleTransposer.RECOMMENDED;
+    private int tabShift = 0;
     private int scroll_value = -1;
 
     // UI elements
@@ -84,7 +93,7 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
         tab = findViewById(R.id.TabActivity_tab);
         countdownOverlay = findViewById(R.id.TabActivity_countdown);
         try {
-            notes = MusicDB.open(this, sheet);
+            storedNotes = MusicDB.open(this, sheet);
         } catch (Exception e) {
             Toast.makeText(this, getString(R.string.error_tune_generation, e.getMessage()),
                     Toast.LENGTH_LONG).show();
@@ -92,9 +101,9 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
             return;
         }
         scrollView = findViewById(R.id.TabActivity_tabScrollPane);
-        tab.setText(MusicSheet.notesToTabs(notes), TextView.BufferType.SPANNABLE);
-        span = (Spannable)tab.getText();
-        this.sheet.transposeKey(notes, sheet.getKey(), MusicSettings.currentKey);
+        myWhistle = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE)
+                .getString(PREF_MY_WHISTLE, WhistleTransposer.RECOMMENDED);
+        applyWhistle();
 
         // Media buttons
         findViewById(R.id.TabActivity_btnPlayPause).setOnClickListener(new View.OnClickListener() {
@@ -113,10 +122,12 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
                 Intent intent = new Intent(getApplicationContext(), SheetActivity.class);
                 intent.putExtra(EXTRA_ABC, sheet.getABC());
                 intent.putExtra(EXTRA_SHEET_TITLE, sheet.getTitle());
+                intent.putExtra(EXTRA_TAB_SHIFT, tabShift);
                 startActivity(intent);
             }
         });
         this.setTune();
+        if (!WhistleTransposer.RECOMMENDED.equals(myWhistle)) warnOutOfRange();
 
         // Scale gesture
         mScaleDetector = new ScaleGestureDetector(this, new TextViewScaleGestureDetector(tab));
@@ -131,7 +142,7 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
                 tempoDialog.show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.tabAction_key:
-                final DialogFragment keyDialog = new KeyDialog(MusicSettings.currentKey, this);
+                final DialogFragment keyDialog = new KeyDialog(sheet.getWhistle(), myWhistle, this);
                 keyDialog.show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.tabAction_more:
@@ -158,6 +169,30 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
                 break;
         }
         return true;
+    }
+
+    /**
+     * Fingerings and sound for the player's whistle: the tabs are transposed so that the
+     * tune sounds at the same pitch as on the recommended whistle (duets with other keys).
+     */
+    private void applyWhistle() {
+        tabShift = WhistleTransposer.fingeringShift(storedNotes, sheet.getWhistle(), myWhistle);
+        final List<MusicNote> fingerings = WhistleTransposer.transposed(storedNotes, tabShift);
+        tab.setText(MusicSheet.notesToTabs(fingerings), TextView.BufferType.SPANNABLE);
+        span = (Spannable) tab.getText();
+        notes = WhistleTransposer.transposed(fingerings, WhistleTransposer.soundShift(myWhistle));
+        try {
+            getSupportActionBar().setSubtitle(getString(R.string.tab_whistle_subtitle,
+                    WhistleTransposer.RECOMMENDED.equals(myWhistle) ? sheet.getWhistle()
+                            : WhistleTransposer.shortName(myWhistle)));
+        } catch (Exception ignored) {}
+    }
+
+    private void warnOutOfRange() {
+        final int unplayable = WhistleTransposer.outOfRange(storedNotes, tabShift);
+        if (unplayable > 0)
+            Toast.makeText(this, getResources().getQuantityString(R.plurals.tab_out_of_range,
+                    unplayable, unplayable), Toast.LENGTH_LONG).show();
     }
 
     private void setTune(){
@@ -290,12 +325,16 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
     }
     @Override
     public void keyChangeCallback(String newKey) {
-        if(!newKey.equals(MusicSettings.currentKey)) {
+        if(!newKey.equals(myWhistle)) {
             this.stop();
-            this.sheet.transposeKey(notes, MusicSettings.currentKey, newKey);
-            MusicSettings.currentKey = newKey;
+            myWhistle = newKey;
+            getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).edit()
+                    .putString(PREF_MY_WHISTLE, myWhistle).apply();
+            applyWhistle();
             this.setTune();
+            warnOutOfRange();
         }
+    }
     }
 
     // Scale tab on pinch
