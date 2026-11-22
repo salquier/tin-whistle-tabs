@@ -10,7 +10,7 @@
 
     <!-- About dialog -->
     <string name="aboutDialog_title">About Tin Whistle Tabs</string>
-    <string name="aboutDialog_message">Tin Whistle Tabs is a fork of <b>Irish Whistle Tabs</b>, created by <a href="http://www.charleslabs.fr"><b>Charles GRASSIN</b></a> under GPLv2 (free, open-source) licence.\n\nThis fork is maintained by <a href="https://github.com/gjambet/tinwhistletabs"><b>Guillaume Jambet</b></a>.\n\nBuilt with <b>Tin Whistle Tab font</b> © <a href="https://www.blaynechastain.com"><b>Blayne Chastain</b></a> and <a href="https://thesession.org"><b>The Session</b></a> ODbL.</string>
+    <string name="aboutDialog_message">Tin Whistle Tabs is a fork of <b>Irish Whistle Tabs</b>, created by <a href="http://www.charleslabs.fr"><b>Charles GRASSIN</b></a> under GPLv2 (free, open-source) licence.\n\nThis fork is maintained by <a href="https://github.com/gjambet/tinwhistletabs"><b>Guillaume Jambet</b></a>.\n\nBuilt with <b>Tin Whistle Tab font</b> © <a href="https://www.blaynechastain.com"><b>Blayne Chastain</b></a> and <a href="https://thesession.org"><b>The Session</b></a> ODbL.\n\nPlayback uses piccolo samples from the <b>FluidR3_GM</b> SoundFont © Frank Wen (MIT licence).</string>
     <string name="aboutDialog_close">Close About dialog</string>
 
     <!-- Tempo dialog -->

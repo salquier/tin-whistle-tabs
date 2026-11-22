@@ -197,6 +197,7 @@ public class TabActivity extends AppCompatActivity implements TempoDialog.TempoC
 
     private void setTune(){
         try {
+            MusicPlayer.loadInstrument(this);
             MusicPlayer.getInstance().setAudioTrack(MusicPlayer.genMusic(notes, (float)tempo/100f));
             findViewById(R.id.TabActivity_btnPlayPause).setEnabled(true);
             findViewById(R.id.TabActivity_btnStop).setEnabled(true);

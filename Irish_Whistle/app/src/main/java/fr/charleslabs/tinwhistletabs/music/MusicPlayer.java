@@ -1,13 +1,18 @@
 package fr.charleslabs.tinwhistletabs.music;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.media.audiofx.PresetReverb;
 import android.os.Handler;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import fr.charleslabs.tinwhistletabs.music.synth.SampleSynth;
 import fr.charleslabs.tinwhistletabs.music.synth.TinWhistleSynth;
 
 public class MusicPlayer {
@@ -27,6 +32,19 @@ public class MusicPlayer {
     }
     private MusicPlayer(){}
 
+    // Recorded instrument (piccolo samples); the synthesiser is used if it cannot be loaded
+    private static final String INSTRUMENT = "instruments/piccolo.bin";
+    private static SampleSynth sampler;
+
+    public static synchronized void loadInstrument(Context c) {
+        if (sampler != null) return;
+        try (InputStream in = new BufferedInputStream(c.getAssets().open(INSTRUMENT))) {
+            sampler = new SampleSynth(in);
+        } catch (IOException e) {
+            sampler = null;
+        }
+    }
+
     public static byte[] genMusic(List<MusicNote> notes, float tempoModifier){
         final float[] frequencies = new float[notes.size()];
         final int[] lengths = new int[notes.size()];
@@ -35,7 +53,9 @@ public class MusicPlayer {
             frequencies[i] = note.isRest() ? 0f : note.getFrequency();
             lengths[i] = (int) (note.getLengthInS(tempoModifier) * SAMPLE_RATE);
         }
-        return toneToBytePCM(TinWhistleSynth.render(frequencies, lengths, SAMPLE_RATE));
+        return toneToBytePCM(sampler != null
+                ? sampler.render(frequencies, lengths, SAMPLE_RATE)
+                : TinWhistleSynth.render(frequencies, lengths, SAMPLE_RATE));
     }
 
     // Media controls: set, play, pause, stop, clear
